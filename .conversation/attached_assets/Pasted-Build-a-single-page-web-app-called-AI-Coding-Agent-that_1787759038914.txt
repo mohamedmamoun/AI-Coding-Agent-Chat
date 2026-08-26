@@ -1,0 +1,40 @@
+Build a single-page web app called "AI Coding Agent" that demonstrates an
+autonomous write → run → debug loop, not just code generation.
+
+CORE BEHAVIOR
+- User describes a small task in plain English (e.g. "write a function that
+  checks if a string is a palindrome, ignoring case and spaces, and test it
+  on 3 examples").
+- The agent (via an LLM call) writes a JavaScript solution.
+- The app EXECUTES that code in a sandboxed environment (a Web Worker or
+  sandboxed iframe — never eval in the main thread, no network/filesystem
+  access from the generated code).
+- Capture stdout/console output AND any runtime errors from execution.
+- Feed the execution result back to the LLM. If there's an error or a
+  failed test, the LLM must revise the code and the app re-runs it
+  automatically. Repeat up to 4 iterations or until it passes.
+- If it still fails after 4 iterations, show that honestly instead of
+  faking success.
+
+UI REQUIREMENTS
+- Left panel: task input + a running "attempt" counter.
+- Right panel: a visible iteration trace — each attempt shows the code
+  written, the execution output/error, and a one-line verdict (pass/fail)
+  before moving to the next attempt. Do not hide failed attempts — showing
+  the debugging loop IS the point of this demo.
+- Final panel: the working code plus a summary of how many iterations it
+  took and what was fixed each time.
+
+TECH
+- Use the Claude API (model "claude-sonnet-4-6") via a direct fetch to
+  https://api.anthropic.com/v1/messages, no API key needed client-side.
+- Sandbox execution using a Web Worker with a timeout (kill it after 3s to
+  guard against infinite loops) — do not use eval() in the main thread.
+- Style: dark technical theme, monospace for code/logs, a clear visual
+  distinction between "agent reasoning," "code," and "execution output."
+
+CONSTRAINTS
+- Keep generated code to plain JS with no external libraries, since the
+  sandbox has no npm/network access.
+- Every iteration must be visibly logged — the failure history is the
+  signature feature of this build, not an implementation detail to hide.

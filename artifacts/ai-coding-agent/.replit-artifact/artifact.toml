@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AI Coding Agent"
+description = "A streaming AI coding workspace where developers can describe a task, get live implementation guidance, and inspect polished markdown and code responses in one focused interface."
+version = "1.0.0"
+id = "artifacts/ai-coding-agent"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26009
+
+[services.development]
+run = "pnpm --filter @workspace/ai-coding-agent run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-coding-agent", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ai-coding-agent/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26009"
+BASE_PATH = "/"
